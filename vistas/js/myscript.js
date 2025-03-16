@@ -2,419 +2,144 @@ let flagValidationEnergy = 0;
 $(document).ready(function()
 {
 
-    
-   // getdeails será nuestra función para enviar la solicitud ajax
     var getdetails = function(codigo_transformador) {
-
-
         return $.getJSON("modelos/consulta.php", {
-
             "codigo_transformador": codigo_transformador
-
         });
-
-    }
+    };
     var getdetails_user = function(codigo_usuario) {
-
-
         return $.getJSON("modelos/consulta.php", {
-
             "codigo_usuario": codigo_usuario
-
         });
-
-    }
-  
-    var getdetails_user_estado = function(codigo_usuario) {
-
-
+    };
+   var getdetails_user_estado = function(codigo_usuario) {
         return $.getJSON("modelos/consulta.php", {
-
             "codigo_usuario_estado": codigo_usuario
-
         });
-
-    }
-    
+   };
    var getdetails_sol_estado = function(codigo_solicitud) {
-
-
         return $.getJSON("modelos/consulta.php", {
-
             "codigo_solicitud": codigo_solicitud
-
         });
-
-    }
-	
-	
-	var getdetails_user_data_in = function(vlrTrafo){
-		
-		
+   };
+   var getdetails_user_data_in = function(vlrTrafo){
 		return $.getJSON("modelos/consulta.php",{
 			"vlr_trafo" : vlrTrafo
 		});
-	}
-    // Al hacer click sobre cualquier elemento que tenga el atributo data-user.....
+   };
+
     $('[data-trans]').click(function(e)
           {
               hidePage();	
               e.preventDefault();
-              // Mostramos texto de que la solicitud está en curso
               $("#response-container").html("<p>Buscando...</p>");
-              vlr_transformador=document.getElementById('codTransformador').value;
-              // this hace referencia al elemento que ha lanzado el evento click
-              // con el método .data('user') obtenemos el valor del atributo data-user de dicho elemento y lo pasamos a la función getdetails definida anteriormente
-              getdetails( vlr_transformador )
-              .done(function(response)
-                {
-                  //done() es ejecutada cuándo se recibe la respuesta del servidor. response es el objeto JSON recibido
-                  if (response.success)
+              let vlr_transformador = document.getElementById('codTransformador').value;
+              getdetails( vlr_transformador)
+                  .done(function(response)
                     {
-                        //  var output = "<h1>" + response.data.message + "</h1>";
-                        var output="";
-                        // recorremos cada usuario
-                        $.each(response.data.transformador, function(key, value)
-                         {
-                                 showPage();
-                                 // recorremos los valores de cada usuario
-                                  output += '<table class="table">';
-                                  output += '    <thead class="thead-dark">';
-                                  output += '      <tr>';
-                                  output += '        <th scope="col">CODIGO DE CONEXIÓN</th>';
-                                  output += '        <th scope="col">CAPACIDAD NOMINAL(KVA)</th>';
-                                  output += '        <th scope="col">LONGITUD</th>';
-                                  output += '        <th scope="col">LATITUD</th>';
-                                  output += '        <th scope="col">ALTITUD</th>';
-                                  output += '        <th scope="col">VOLTAJE NOMINAL</th>';
-                                  output += '        <th scope="col">PORCENTAJE OCUPADO (%)</th>';
-                                  //output += '        <th scope="col">PORCENTAJE OCUPADO ENERGIA (%)</th>';
-                                  output += '      </tr>';
-                                  output += '    </thead>';
-                                  output += '<tbody><tr class="table-light">';
-                                vlr_capacidad_nom=0;
-                                vlr_capacidad_ene=0;
-                            $.each(value, function(userkey, uservalue)
-                              {  
-
-                                            codigo_transformador_global=vlr_transformador;
-                                          if(userkey=="capacidad_nominal")
-                                            {
-                                              vlr_capacidad_nom = uservalue;
-                                            }
-                                            
-                                
-                                            if(userkey=="total")
-                                            {
-                                                dispo_potencia_global=uservalue;
-												
-												                        calculado = ((uservalue*100)/vlr_capacidad_nom).toFixed(2);
-												
-                                                
-                                                if (parseFloat(calculado) >= 0 && parseFloat(calculado)<=30 )
-                                                    {
-                                                        output +=  "<td class='bg-success'>"+calculado+ '</td>';
-                                                    }
-                                                 else if(parseFloat(calculado) >30 && parseFloat(calculado)<=40 )
-                                                    {
-                                                        output +=  "<td class='bg-warning'>"+calculado+ '</td>';
-                                                    } 
-                                                 else if(parseFloat(calculado) >40 && parseFloat(calculado)<=50 )
-                                                    {
-                                                        output +=  "<td class='bg-low_danger'>"+calculado+ '</td>';
-													                          }       
-                                                else
-                                                    {
-                                                        
-                                                        output +=  "<td class='bg-danger'>"+calculado+ '</td>';
-                                                    }
-												                      	$("#dispo_potencia").val(calculado);
-                                            }
-                                            else
-                                                {
-                                                     if(userkey=="longitud"){lngi_global=uservalue;}
-                                                     if(userkey=="laltitud"){lati_global=uservalue;}
-                                                 
-                                                   output +=  "<td class='bg-info'>"+uservalue+ '</td>';
-                                                }
-                           });
-                            output += '</tr></<tbody>';
-                            output+='  </table>';
-                        });
-                        // Actualizamos el HTML del elemento con id="#response-container"
-                        showPage();
-                        $("#response-container").html(output);
-                        $("#validador").val("Búsqueda exitosa");
-                        document.getElementById("target_aviso").style.display="";
-                        initMap(lati_global,lngi_global)
-                  }
-                  else
-                        {
-                            //response.success no es true
-                             showPage();
+                      if (response.success) {
+                          codigo_transformador_global = vlr_transformador;
+                          let outputDataTrafo = getStructToTrafo(response);
+                            showPage();
+                            $("#response-container").html(outputDataTrafo);
+                            $("#validador").val("Búsqueda exitosa");
+                            document.getElementById("target_aviso").style.display="";
+                            initMap(lati_global,lngi_global);
+                      } else {
+                            showPage();
                             $("#response-container").html(response.data.message);
-                            sweetAlert("Oops", response.data.message, "error");    
+                            sweetAlert("Oops", response.data.message, "error");
                             $("#validador").val("");
-                        }
-
-                      })
-                      .fail(function(jqXHR, textStatus, errorThrown)
-                          {
-                               showPage();
-                              $("#response-container").html("Algo ha fallado, comuniquese con nuestra linea, 6185871 ext 341: " + textStatus);
-                              sweetAlert("Oops","Algo ha fallado, comuniquese con nuestra linea, 6185871 ext 343 y comunique este error " + textStatus, "error");    
-                              $("#validador").val("");
-                          });
-          });
-
-          // Al hacer click sobre cualquier elemento que tenga el atributo data-user.....
-          $('[data-usu]').click(function(e)
-                {
-                    
-                    
-                         
-					hidePage();		
-                    e.preventDefault();
-                    // Mostramos texto de que la solicitud está en curso
-                    $("#response-container").html("<p>Buscando...</p>");
-                    vlr_usuario=document.getElementById('codUsuario').value;
-                    
-                    
-                    getdetails_user_estado(vlr_usuario)
-                    .done(function(response)
+                      }
+                    })
+                  .fail(function(jqXHR, textStatus)
                     {
-                       
-                     if (response.success)
-                          {
-                               $.each(response.data.solicitud, function(key, value)
-                                {
-                                   
-                                    
-                                    $.each(value, function(userkey, uservalue)
+                             showPage();
+                             $("#response-container").html("Algo ha fallado, comuniquese con nuestra linea, 6185871 ext 341: " + textStatus);
+                             sweetAlert("Oops","Algo ha fallado, comuniquese con nuestra linea, 6185871 ext 343 y comunique este error " + textStatus, "error");
+                             $("#validador").val("");
+                    });
+          });
+//**--------------------------------------------------------------------------------------------//-------------------------------------**//
+    $('[data-usu]').click(function(e)
+          {
+     	      hidePage();
+              e.preventDefault();
+              $("#response-container").html("<p>Buscando...</p>");
+              let vlr_usuario=document.getElementById('codUsuario').value;
+              getdetails_user_estado(vlr_usuario)
+                   .done(function(response)
+                    {
+                         if (response.success) {
+                                   $.each(response.data.solicitud, function(key, value)
                                     {
-                                    
-                                     if(userkey=="estado_solicitud_idestado_solicitud")
-                                       {
-                                           
-                                           
-                                           if(uservalue.indexOf('1')!= -1){ 
-                                               
-                                               showPage(); 
-                                               sweetAlert("Oops", "Ud tiene en estos momentos una solicitud pendiente de aprobación.", "error");
-                                                $("#validador").val("");
-                                                $("#email").val("");
-                                                $("telefono_correspondencia").val("");
-                                                $("#codTransformador").val("");
-                                                $("#response-container").html("");
-                                                
-                                           }
-                                           else
-                                           {
-                                              // inicio
-                                                  getdetails_user( vlr_usuario )
-                                                  .done(function(response)
-                                                     {
-                                                      if (response.success)
-                                                        {
-                                                                  var output="";
-                                                                  // recorremos cada usuario
-                                                              $.each(response.data.transformador, function(key, value)
-                                                               {
-                                                                   
-                                                                   
-                                                                   showPage(); 
-                                                                  // recorremos los valores de cada usuario
-                                                                  output += '<table class="table">';
-                                                                  output += '    <thead class="thead-dark">';
-                                                                  output += '      <tr>';
-                                                                  output += '        <th scope="col">CODIGO DE CONEXIÓN</th>';
-                                                                  output += '        <th scope="col">CAPACIDAD NOMINAL(KVA)</th>';
-                                                                  output += '        <th scope="col">LONGITUD</th>';
-                                                                  output += '        <th scope="col">LATITUD</th>';
-                                                                  output += '        <th scope="col">ALTITUD</th>';
-                                                                  output += '        <th scope="col">VOLTAJE NOMINAL</th>';
-                                                                  output += '        <th scope="col">PORCENTAJE OCUPADO (%)</th>';
-                                                                  //output += '        <th scope="col">PORCENTAJE OCUPADO ENERGIA (%)</th>';
-                                                                  output += '      </tr>';
-                                                                  output += '    </thead>';
-                                                                  output += '<tbody><tr class="table-light">';
-                                                                  $.each(value, function(userkey, uservalue)
-                                                                    {
-                                                                       
-                                                                                  if(userkey=="trafo") { $("#codTransformador").val(uservalue); codigo_transformador_global=uservalue; }
-                                                                                   if(userkey=="capacidad_nominal")
-																					{
-																					  vlr_capacidad_nom = uservalue;
-																					}
-																				  if(userkey=="total")
-																							{
-																								dispo_potencia_global=uservalue;
-																								
-																								calculado = ((uservalue*100)/vlr_capacidad_nom).toFixed(2);
-																								console.log(uservalue);
-																								console.log(vlr_capacidad_nom);
-																								console.log(calculado);
-																																				
-																								if (parseFloat(calculado) >= 0 && parseFloat(calculado)<=30 )
-																								{
-																									output +=  "<td class='bg-success'>"+calculado+ '</td>';
-																								}
-																							 else if(parseFloat(calculado) >30 && parseFloat(calculado)<=40 )
-																								{
-																									output +=  "<td class='bg-warning'>"+calculado+ '</td>';
-																								} 
-																							 else if(parseFloat(calculado) >40 && parseFloat(calculado)<=50 )
-																								{
-																									output +=  "<td class='bg-danger'>"+calculado+ '</td>';
-																								}       
-																							else
-																								{
-																									
-																									output +=  "<td class='bg-danger'>"+calculado+ '</td>';
-																								}
-																							$("#dispo_potencia").val(calculado);
-																							}
-                                              
-																					else 
-																					{ 
-																							if(userkey=="longitud")
-																								{
-																									lngi_global=uservalue;
-																								}
-																							if(userkey=="laltitud")
-																								{
-																									lati_global=uservalue;
-																								}
-																							output +=  "<td class='bg-info'>"+uservalue+ '</td>';
-																									  
-																					}
-                                                                 
-                                                                    });
-                                                                  output += '</tr></<tbody>';
-                                                                  output+='  </table>';
-                                                                });
-                                                              // Actualizamos el HTML del elemento con id="#response-container"
-                                
-                                                              $("#response-container").html(output);
-                                                              $("#validador").val("Búsqueda exitosa");
-                                                              document.getElementById("target_aviso").style.display="";
-                                                              initMap(lati_global,lngi_global)    
-                                                        }
-                                                        else
-                                                        {
-                                                            //response.success no es true
-                                                            showPage();
-                                                            $("#response-container").html(response.data.message);
-                                                            sweetAlert("Oops", response.data.message, "error");    
-                                                            //initMap(lati_global,lngi_global)
-                                                             $("#validador").val("");
-                                                        }
-                                
+                                        $.each(value, function(userkey, uservalue)
+                                          {
+                                            if(userkey==="estado_solicitud_idestado_solicitud") {
+                                               if(uservalue.indexOf('1')!== -1) {
+                                                    showPage();
+                                                    sweetAlert("Oops", "Ud tiene en estos momentos una solicitud pendiente de aprobación.", "error");
+                                                    $("#validador").val("");
+                                                    $("#email").val("");
+                                                    $("telefono_correspondencia").val("");
+                                                    $("#codTransformador").val("");
+                                                    $("#response-container").html("");
+                                               } else {
+                                                     getdetails_user(vlr_usuario)
+                                                      .done(function(response){
+                                                              if (response.success) {
+                                                                  let outputDataTrafo = getStructToTrafo(response);
+                                                                  showPage();
+                                                                  $("#response-container").html(outputDataTrafo);
+                                                                      $("#validador").val("Búsqueda exitosa");
+                                                                      document.getElementById("target_aviso").style.display="";
+                                                                      initMap(lati_global,lngi_global);
+                                                                } else {
+                                                                    showPage();
+                                                                    $("#response-container").html(response.data.message);
+                                                                    sweetAlert("Oops", response.data.message, "error");
+                                                                    $("#validador").val("");
+                                                                }
                                                       })
-                                                  .fail(function(jqXHR, textStatus, errorThrown)
-                                                      {
-                                                         showPage();
-                                                          $("#response-container").html("Algo ha fallado, comuniquese con nuestra linea, 6185871 ext 341: " + textStatus);
-                                                          sweetAlert("Oops","Algo ha fallado, comuniquese con nuestra linea, 6185871 ext 343 y comunique este error " + textStatus, "error");    
-                                                          $("#validador").val("");
+                                                      .fail(function(jqXHR, textStatus){
+                                                             showPage();
+                                                              $("#response-container").html("Algo ha fallado, comuniquese con nuestra linea, 6185871 ext 341: " + textStatus);
+                                                              sweetAlert("Oops","Algo ha fallado, comuniquese con nuestra linea, 6185871 ext 343 y comunique este error " + textStatus, "error");
+                                                              $("#validador").val("");
                                                       });
-                                                                          
-                                              //fin
-                                              
-                                        
-                                               
-                                           }
-                                           
-                                           
-                                       }
-                                        
-                                        
-                                    });    
-                                });
-                              
-                          }  
-                                        else
-                                            {
-                                                //response.success no es true
-                                               showPage();
-                                                $("#response-container").html(response.data.message);
-                                                sweetAlert("Oops", response.data.message, "error");    
-                    
-                                                 $("#validador").val("");
-                                            }
-
-                      })
-                      .fail(function(jqXHR, textStatus, errorThrown)
-                          {
+                                               }
+                                            }});
+                                    });
+                         } else {
+                             showPage();
+                             $("#response-container").html(response.data.message);
+                             sweetAlert("Oops", response.data.message, "error");
+                             $("#validador").val("");
+                         }
+                    })
+                    .fail(function(jqXHR, textStatus)
+                    {
                              showPage();
                               $("#response-container").html("Algo ha fallado, comuniquese con nuestra linea, 6185871 ext 101: " + textStatus);
                               sweetAlert("Oops","Algo ha fallado, comuniquese con nuestra linea, 6185871 ext 101 y comunique este error " + textStatus, "error");    
                               $("#validador").val("");
-                          });      
-                          
-                          
-                              
-
-                          
-                          
-                          
-                          
+                    });
                 });
-
-                $('[data-forma]').click(function(e)
-                      {
-
-                      }
-                    );
-
-
-//**--------------------------------------------------------------------------------------------//-------------------------------------**//
-                $('[data-usu-consulta]').click(function(e)
-                      {
-                        
-                        vlr_usuario_detalle=document.getElementById('idClienteEnergia').value;
-                        getdetails_user_data( vlr_usuario_detalle )
-                        .done(function(response)
-                            {
-                              if (response.success)
-                                {
-                                  var output="";
-                                  $.each(response.data.transformador, function(key, value)
-                                   {
-                                    
-                                        $.each(value, function(userkey, uservalue)
-                                          {
-
-
-                                          });   
-                                    }); 
-                                  }
-                            })
-                      .fail(function(jqXHR, textStatus, errorThrown)
-                          {
-                              //$("#response-container").html("Algo ha fallado, comuniquese con nuestra linea, 6185871 ext 341: " + textStatus);
-                              //$("#validador").val("");
-                          });  
-
-                      });
-
 //**--------------------------------------------------------------------------------------------//-------------------------------------**//
 
                 $('[data-sol]').click(function(e)
                       {
-                        vlr_solicitud=document.getElementById('nro_solicitud_buscar').value;
+                        let vlr_solicitud=document.getElementById('nro_solicitud_buscar').value;
                         hidePage();
                         getdetails_sol_estado( vlr_solicitud )
                         .done(function(response)
                             {
                               if (response.success)
                                 {
-                                  var output="";
+                                  let output="";
                                   $.each(response.data.solicitud, function(key, value)
                                    {
-                                     
                                               showPage();
-                                                     // recorremos los valores de cada usuario
                                               output += '<table class="table">';
                                               output += '    <thead class="thead-dark">';
                                               output += '      <tr>';
@@ -427,58 +152,45 @@ $(document).ready(function()
                                         $.each(value, function(userkey, uservalue)
                                           {
                                              
-                                             if(userkey=="nro_solicitud"){ output +=  "<td class='bg-success'>"+uservalue+ '</td>'; }
-                                             if(userkey=="estado_solicitud")
-                                                { 
-                                                    if(uservalue=="Registrada")
-                                                      {
+                                             if(userkey==="nro_solicitud") {
+                                                 output +=  "<td class='bg-success'>"+uservalue+ '</td>';
+                                             }
+                                             if(userkey==="estado_solicitud") {
+                                                    if(uservalue==="Registrada") {
                                                           output +=  "<td class='bg-warning'>"+uservalue+ '</td>';
-                                                      }
-                                                     else if(uservalue=="Aprobada")
-                                                      {
+                                                    } else if(uservalue==="Aprobada") {
                                                           output +=  "<td class='bg-success'>"+uservalue+ '</td>';
-                                                      }
-                                                      else if(uservalue=="Funcional")
-                                                      {
+                                                    } else if(uservalue==="Funcional") {
                                                           output +=  "<td class='bg-success'>"+uservalue+ '</td>';
-                                                      }
-                                                      else
-                                                      {
+                                                    } else {
                                                           output +=  "<td class='bg-low_danger'>"+uservalue+ '</td>';
-                                                      }
-                                                    
-                                                }
-                                              if(userkey=="observaciones"){ output +=  "<td class='bg-success'>"+uservalue+ '</td>'; }
+                                                    }
+                                             }
+                                             if(userkey==="observaciones") {
+                                                 output +=  "<td class='bg-success'>"+uservalue+ '</td>';
+                                             }
                                           });
-                                          
-                                           output += '</tr></<tbody>';
-                                           output+='  </table>';
+                                        output += '</tr></<tbody>';
+                                       output+='  </table>';
                                     }); 
                                       $("#response-container").html(output);
+                                  } else {
+                                    showPage();
+                                    $("#response-container").html(response.data.message);
+                                    sweetAlert("Oops", response.data.message, "error");
+                                    $("#validador").val("");
+                                    $("#nro_solicitud_buscar").val("");
                                   }
-                                   else
-                                                        {
-                                                            //response.success no es true
-                                                            showPage();
-                                                            $("#response-container").html(response.data.message);
-                                                            sweetAlert("Oops", response.data.message, "error");    
-                                
-                                                             $("#validador").val("");
-                                                             $("#nro_solicitud_buscar").val("");
-                                                        }
                             })
-                      .fail(function(jqXHR, textStatus, errorThrown)
-                          {
-                               showPage();
-                              $("#response-container").html("Algo ha fallado, comuniquese con nuestra linea, 6185871 ext 341: " + textStatus);
-                              $("#validador").val("");
-                          });  
-
+                            .fail(function(jqXHR, textStatus)
+                              {
+                                   showPage();
+                                  $("#response-container").html("Algo ha fallado, comuniquese con nuestra linea, 6185871 ext 341: " + textStatus);
+                                  $("#validador").val("");
+                              });
                       });
 //**--------------------------------------------------------------------------------------------//-------------------------------------**//
-
-              // Toolbar extra buttons
-                          var btnFinish = $('<button></button>').text('Enviar')
+                          let btnFinish = $('<button></button>').text('Enviar')
                                                            .addClass('btn btn-info')
                                                            .on('click', function(){
                                                                   if( !$(this).hasClass('disabled')){
@@ -500,57 +212,39 @@ $(document).ready(function()
                                                                       }
                                                                   }
                                                               });
-                                           var btnCancel = $('<button></button>').text('Cancelar')
+                          let btnCancel = $('<button></button>').text('Cancelar')
                                                            .addClass('btn btn-danger')
                                                            .on('click', function(){
                                                                   $('#smartwizard').smartWizard("reset");
                                                                   $('#myForm').find("input, textarea").val("");
                                                               });
-                                           var btnDef = $('<button></button>').text('Definiciones')
+                          let btnDef = $('<button></button>').text('Definiciones')
                                                            .addClass('btn btn-success')
                                                            .attr('data-target','.bd-example-modal-lg')
                                                            .attr('data-toggle',"modal")
-                                                           .on('click', function(){
-                                                                 
-                                                              });
-                                           var btnCond = $('<button></button>').text('Cond. conexión')
+                                                           .on('click', function(){});
+                          let btnCond = $('<button></button>').text('Cond. conexión')
                                                            .addClass('btn btn-success')
                                                            .attr('data-target','.con-bd-example-modal-lg')
                                                            .attr('data-toggle',"modal")
-                                                           .on('click', function(){
-                                                                 
-                                                              });            
-                                            var btnProc = $('<button></button>').text('Proc. conexión')
+                                                           .on('click', function(){});
+                          let btnProc = $('<button></button>').text('Proc. conexión')
                                                            .addClass('btn btn-success')
                                                            .attr('data-target','.pro-bd-example-modal-lg')
                                                            .attr('data-toggle',"modal")
-                                                           .on('click', function(){
-                                                                 
-                                                              });          
-                                            var btnCone = $('<button></button>').text('Con. medición')
+                                                           .on('click', function(){});
+                          let btnCone = $('<button></button>').text('Con. medición')
                                                            .addClass('btn btn-success')
                                                            .attr('data-target','.con-me-bd-example-modal-lg')
                                                            .attr('data-toggle',"modal")
-                                                           .on('click', function(){
-                                                                 
-                                                              });  
-                                            var btninfoFactura = $('<button></button>').text('Info. factura')
+                                                           .on('click', function(){});
+                          let btninfoFactura = $('<button></button>').text('Info. factura')
                                                            .addClass('btn btn-success')
                                                            .attr('data-target','.info-fac-bd-example-modal-lg')
                                                            .attr('data-toggle',"modal")
-                                                           .on('click', function(){
-                                                                 
-                                                              });
-                                            /*var btninfoImportante = $('<button></button>').text('Clic antes de..')
-                                                           .addClass('btn btn-success')
-                                                           .attr('data-target','.con-imp-bd-example-modal-lg')
-                                                           .attr('data-toggle',"modal")
-                                                           .attr('id',"importante_button")
-                                                           .on('click', function(){
-                                                                 
-                                                              });        */            
-                                              // Smart Wizard
-                                              $('#smartwizard').smartWizard({
+                                                           .on('click', function(){});
+                                              // Smart
+                          $('#smartwizard').smartWizard({
                                                       selected: 0,
                                                       theme: 'dots',
                                                       transitionEffect:'fade',
@@ -565,7 +259,7 @@ $(document).ready(function()
                                                               }
                                                    });
 
-                                          $("#smartwizard").on("leaveStep", function(e, anchorObject, stepNumber, stepDirection) {
+                          $("#smartwizard").on("leaveStep", function(e, anchorObject, stepNumber, stepDirection) {
                                               var elmForm = $("#form-step-" + stepNumber);
                                               // stepDirection === 'forward' :- this condition allows to do the form validation
                                               // only on forward navigation, that makes easy navigation on backwards still do the validation when going next
@@ -580,7 +274,7 @@ $(document).ready(function()
                                               return true;
                                           });
 
-                                          $("#smartwizard").on("showStep", function(e, anchorObject, stepNumber, stepDirection) {
+                          $("#smartwizard").on("showStep", function(e, anchorObject, stepNumber, stepDirection) {
                                               // Enable finish button only on last step
                                               if(stepNumber == 3){
                                                   $('.btn-finish').removeClass('disabled');
@@ -589,7 +283,7 @@ $(document).ready(function()
                                               }
                                           });
 
-                                          $('input[type=file]').bind("change",function()
+                          $('input[type=file]').bind("change",function()
                                                   {
                                                      var iden=this.id;
                                                     if(this.files[0].size > 21000000)
@@ -599,9 +293,6 @@ $(document).ready(function()
                                                         controlInput.replaceWith(controlInput = controlInput.val('').clone(true));
                                                         }
                                                   });
-
-//**--------------------------------------------------------------------------------------------//-------------------------------------**//
-
 
 //**--------------------------------------------------------------------------------------------//-------------------------------------**//
                 $('[data-proy-ene]').blur(function(e)
@@ -652,7 +343,7 @@ $(document).ready(function()
                                     }); 
                                   }
                             })
-                      .fail(function(jqXHR, textStatus, errorThrown)
+                      .fail(function(jqXHR, textStatus)
                           {
                               //$("#response-container").html("Algo ha fallado, comuniquese con nuestra linea, 6185871 ext 341: " + textStatus);
                               //$("#validador").val("");
@@ -673,6 +364,64 @@ $(document).ready(function()
 
 });
 
+function getStructToTrafo(response){
+
+   let output = "";
+   $.each(response.data.transformador, function(key, value)
+    {
+        output += '<table class="table">';
+        output += '    <thead class="thead-dark">';
+        output += '      <tr>';
+        output += '        <th scope="col">CODIGO DE CONEXIÓN</th>';
+        output += '        <th scope="col">CAPACIDAD NOMINAL(KVA)</th>';
+        output += '        <th scope="col">LONGITUD</th>';
+        output += '        <th scope="col">LATITUD</th>';
+        output += '        <th scope="col">ALTITUD</th>';
+        output += '        <th scope="col">VOLTAJE NOMINAL</th>';
+        output += '        <th scope="col">PORCENTAJE OCUPADO (%)</th>';
+        output += '      </tr>';
+        output += '    </thead>';
+        output += '<tbody><tr class="table-light">';
+        let vlr_capacidad_nom=0;
+        $.each(value, function(userKey, userValue)
+        {
+            if (userKey === "trafo") {
+                $("#codTransformador").val(userValue);
+                codigo_transformador_global = userValue;
+            }
+            if (userKey === "capacidad_nominal") {
+                vlr_capacidad_nom = userValue;
+            }
+            let calculado;
+            if (userKey === "total") {
+                dispo_potencia_global = userValue;
+                calculado = ((userValue * 100) / vlr_capacidad_nom).toFixed(2);
+
+                if (parseFloat(calculado) >= 0 && parseFloat(calculado) <= 30) {
+                    output += "<td class='bg-success'>" + calculado + '</td>';
+                } else if (parseFloat(calculado) > 30 && parseFloat(calculado) <= 40) {
+                    output += "<td class='bg-info'>" + calculado + '</td>';
+                } else if (parseFloat(calculado) > 40 && parseFloat(calculado) <= 50) {
+                    output += "<td class='bg-warning'>" + calculado + '</td>';
+                } else {
+                    output += "<td class='bg-danger'>" + calculado + '</td>';
+                }
+                $("#dispo_potencia").val(calculado);
+            } else {
+                if (userKey === "longitud") {
+                    lngi_global = userValue;
+                }
+                if (userKey === "laltitud") {
+                    lati_global = userValue;
+                }
+                output += "<td class='bg-info'>" + userValue + '</td>';
+            }
+        });
+        output += '</tr></<tbody>';
+        output+='  </table>';
+    });
+   return output;
+}
 function searchValueDB()
 {
 	let listValueArray = [];
@@ -691,7 +440,6 @@ function changeOption2(valor)
       document.getElementById("potencia_panel").required = true;
       document.getElementById("potencia_total").required = true;
       document.getElementById("fecha_instalacion_solar_fv").required = true;
-      //document.getElementById("nivel_tension").required = true;
       document.getElementById("rele_flujo_inverso").required = true;
       document.getElementById("capacidad_dc").required = true;
       document.getElementById("voltaje_salida").required = true;
@@ -708,8 +456,6 @@ function changeOption2(valor)
       document.getElementById("potencia").required = true;
       document.getElementById("impedancia").required = true;
       document.getElementById("grupo").required = true;
-      
-
         document.getElementById("div_info_solar_fv").style.display="";
         document.getElementById("div_info_solar_fv_2").style.display="";
         document.getElementById("div_info_solar_fv_3").style.display="";
@@ -718,8 +464,6 @@ function changeOption2(valor)
   else
   {
 
-    
-                
       document.getElementById("potencia_panel").removeAttribute("required");
       document.getElementById("potencia_total").removeAttribute("required");
       document.getElementById("fecha_instalacion_solar_fv").removeAttribute("required");
@@ -856,11 +600,10 @@ function changeOption(valor)
       }
      
   }
-
 function changeOption3(valor)
 {
 
-      if(valor=="Si")
+      if(valor==="Si")
       {
           
         document.getElementById("energia_cap").required = true;
@@ -887,8 +630,6 @@ function changeOption3(valor)
       }
      
   }
-
-
 function changeOption4(valor)
 {
    if(valor=="Si")
@@ -910,10 +651,7 @@ function changeOption4(valor)
       }
      
   }
-  
-  
-  
-  function changeOption5(valor)
+function changeOption5(valor)
 {
    if(valor=="Si")
       {
@@ -934,8 +672,7 @@ function changeOption4(valor)
       }
      
   }
-  
-  function changeOption6(valor)
+function changeOption6(valor)
 {
    if(valor=="Si")
       {
@@ -956,8 +693,7 @@ function changeOption4(valor)
       }
      
   }
-  
-  function changeOption7(valor)
+function changeOption7(valor)
 {
    if(valor=="No")
       {

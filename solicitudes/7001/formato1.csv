@@ -1,0 +1,6 @@
+Codigo proyecto;Nombre del proyecto;Descripcion del proyecto;Nivel;Tipo inversion;Año entrada operacion;Municipio;STR construccion;PIEC;Concepto UPME;Observaciones
+P1;Autopista - Fenix;Red MT SDL Ruitoque ESP Desde Porteria Rosales a Balcones Vaduz y AMV (Santa Ana) y proyecto FENIX vía Montearroyo;2;II;2019;68276;N;N;*;*
+P2;Pta Ruitoque - Muisca;Red MT SDL Ruitoque ESP desde Portería Punta Ruitoque a proyecto Muisca;2;II;2020;68276;N;N;*;*
+P3;Nautica - Pta Ruitoque;Red MT SDL Ruitoque ESP desde Sede Nautica hasta Punta Ruitoque Usando servidumbre existente red acueducto;2;IV;2019;68276;N;N;*;*
+P4;Actualizacion 015;Actualizacion SCADA Adecuaciones numeral 5.2.10 Requisitos del esquema de incentivos y compensaciones CREG 015 de 2018;3;IV;2019;68276;N;N;*;En el formato 4.10 se reporto el SCADA y el GIS
+P5;Abadias-HIC;Equipos Media y baja tension proyecto HIC;2;II;2020;68276;N;N;*;*

@@ -51,7 +51,8 @@ class ControladorSolicitud
                                                                potencia_nominal_trafo, impedancia_cc, grupo_conexion, descripcion_elementos_proteccion_trafo, estandar_ieee_ni, 
                                                                proteccion_inversores, anexo_general, cln_suministra_medidor, medidor_bidireccional, medidor_perfil_horario, 
                                                                descripcion_gral_proyecto, estado_solicitud_idestado_solicitud, fecha_actualizacion, observaciones_empresa,energia_cap,
-                                                               energia_ene,fecha_puesta_operacion,fecha_inicio_prueba_conexion,fecha_fin_prueba_conexion,recurso_energetico,tipo_tecnologia) 
+                                                               energia_ene,fecha_puesta_operacion,fecha_inicio_prueba_conexion,fecha_fin_prueba_conexion,recurso_energetico,tipo_tecnologia,
+                                                               proporcionaMedidor,nombrePromotor,emailPromotor,telefonoPromotor) 
                                         VALUES("'.$_POST["idClienteEnergia"].'",DATE_FORMAT(NOW(),"%Y-%m-%d %T"),"'.$todo.'","'.$_POST["email"].'","'.$_POST["telefono_correspondencia"].'",
                                                "'.$_POST["tipo_generacion_instalar"].'","'.$_POST["entrega_excedentes_red"].'","'.$_POST["fecha_generacion_autogeneracion"].'",
                                                "'.$_POST["fecha_generacion_distribucion"].'","'.$_POST["potencia_instalada_kva"].'","'.$_POST["potencia_entregar_red"].'",
@@ -68,7 +69,8 @@ class ControladorSolicitud
                                                "'.$_POST["descripcion_elementos_proteccion_trafo"].'","'.$_POST["estandar_ieee_ni"].'","'.$_POST["proteccion_inversores"].'",
                                                "'.$_POST["anexo_general"].'","'.$_POST["cln_suministra_medidor"].'","'.$_POST["medidor_bidireccional"].'",
                                                "'.$_POST["medidor_perfil_horario"].'","'.$_POST["descripcion_gral_proyecto"].'",1,DATE_FORMAT(NOW(),"%Y-%m-%d %T"),"'.$_POST["observaciones_empresa"].'",
-                                               "'.$_POST["energia_cap"].'","'.$_POST["energia_ene"].'","'.$_POST["fecha_puesta_operacion"].'","","","'.$_POST["recurso_energetico"].'","'.$_POST["tipo_tecnologia"].'")';
+                                               "'.$_POST["energia_cap"].'","'.$_POST["energia_ene"].'","'.$_POST["fecha_puesta_operacion"].'","","","'.$_POST["recurso_energetico"].'","'.$_POST["tipo_tecnologia"].'",
+                                               "'.$_POST["proporcionaMedidor"].'","'.$_POST["nombrePromotor"].'","'.$_POST["emailPromotor"].'","'.$_POST["telefonoPromotor"].'")';
                             $respuesta_consulta = $database->getLastIDQuery($sqlInsert);
                             $last_id = $respuesta_consulta;
                             
@@ -113,7 +115,8 @@ class ControladorSolicitud
 																	$mail->addAddress('gestiontecnicaenergia3@ruitoqueesp.com', 'Usuario :');     // Add a recipient
 																	$mail->addAddress('atencioncliente3@ruitoqueesp.com', 'Usuario :');     // Add a recipient*/
                                                                     $mail->addAddress('gestionfronterascomerciales1@ruitoqueesp.com', 'Usuario :');
-																	$mail->isHTML(true);               // Set email format to HTML
+                                                                    $mail->addAddress('escribanos@ruitoqueesp.com', 'Usuario :');
+                                                                    $mail->isHTML(true);               // Set email format to HTML
 																	$mail->CharSet = 'UTF-8';
 																	$mail->AddAttachment('./solicitudes/'.$_POST['idClienteEnergia'].'/'.$name);
 																	$mail->Subject = 'Solicitud registrada';

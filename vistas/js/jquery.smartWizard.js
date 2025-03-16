@@ -383,22 +383,18 @@ $('[data-usu-consulta-codigo]').click(function(e)
                                   var output="";
                                   $.each(response.data.transformador, function(key, value)
                                    {
-                                        //alert(key+"--"+value);
-                                    
+
                                         $.each(value, function(userkey, uservalue)
                                           {
 
-                                              //alert(userkey+"--"+uservalue);
-                                              if(userkey=="ID_INTERNO"){$("#idClienteEnergia").val(uservalue); } 
-                                              if(userkey=="NOMBRE_RAZON_SOCIAL"){ $("#nombre_razon_social").val(uservalue); }
-                                              if(userkey=="DIRECCION_FRONTERA"){ $("#direccion_frontera").val(uservalue);  }
-                                              if(userkey=="NIT_CEDULA"){ $("#nit_cedula").val(uservalue); }
-                                              if(userkey=="MUNICIPIO"){ $("#municipio").val(uservalue); }
-                                              //if(userkey=="CORREO_ELECTRONICO"){ $("#email").val(uservalue); $("#email").prop('disabled', true);}
-                                              //if(userkey=="TELEFONO_CORRESPONDENCIA"){$("#telefono_correspondencia").val(uservalue); $("#telefono_correspondencia").prop('disabled', true);}
-                                              if(userkey=="TIPO"){ $("#tipo").val(uservalue);    }
-                                              if(userkey=="M02MED_SERIE"){ $("#serie").val(uservalue); }     
-                                              if(userkey=="ESTRATO") { $("#estrato").val(uservalue);  }                                                 
+                                              if(userkey==="ID_INTERNO"){$("#idClienteEnergia").val(uservalue); }
+                                              if(userkey==="NOMBRE_RAZON_SOCIAL"){ $("#nombre_razon_social").val(uservalue); }
+                                              if(userkey==="DIRECCION_FRONTERA"){ $("#direccion_frontera").val(uservalue);  }
+                                              if(userkey==="NIT_CEDULA"){ $("#nit_cedula").val(uservalue); }
+                                              if(userkey==="MUNICIPIO"){ $("#municipio").val(uservalue); }
+                                              if(userkey==="TIPO"){ $("#tipo").val(uservalue);    }
+                                              if(userkey==="M02MED_SERIE"){ $("#serie").val(uservalue); }
+                                              if(userkey==="ESTRATO") { $("#estrato").val(uservalue);  }
                                               $("#codigo_transformador").val(document.getElementById('codTransformador').value);   
 
                                           });   
@@ -419,32 +415,26 @@ $('[data-usu-consulta-codigo]').click(function(e)
                         }   
                      
                 }
+            if(si === 1) {
+                const potencia = $("#dispo_potencia").val();
+                let mensaje = "";
 
-              if ($("#dispo_potencia").val() > 50)
-                 {
-                  //e.preventDefault();
-                  sweetAlert("Su solicitud no se puede tramitar", "El transformador no tiene la potencia suficiente para su solicitud. Favor comunicarse con nuestra linea 7-6185871!", "error");    
-                  $("#validador").val("");
-                  //return false;
-                 }
-              /*if( $("#dispo_potencia").val() <= 15)
-                {
-                  sweetAlert("Su solicitud no se puede tramitar", "El transformador tiene la potencia pero no la energia suficiente para su solicitud. Favor comunicarse con nuestra linea 7-6185871 ext 233!", "error");      
-                  $("#validador").val("");
-                }    
+                if (potencia > 50) {
+                    mensaje = "Su solicitud será recibida, pero deberá adjuntar un estudio de conexión simplificada, adjuntelo con los demás documentos al final de la solicitud";
+                } else if (potencia > 40 && potencia <= 50) {
+                    mensaje = "Su solicitud será recibida, pero si su petición hace que el porcentaje ocupado del transformador alcance el 50% o lo supera, el departamento técnico se contactará con usted para el envío del estudio de conexión simplificada";
+                }
 
-              if( $("#dispo_potencia").val() > 15)
-                {
-                  sweetAlert("Su solicitud no se puede tramitar", "El transformador no tiene la potencia pero tiene la energia suficiente para su solicitud. Favor comunicarse con nuestra linea 7-6185871 ext 233!", "error");      
-                  $("#validador").val("");
-                }*/
-			  if(flagValidationEnergy == 1)
-			  {
+                if (mensaje !== "") {
+                    sweetAlert("Información importante", mensaje, "warning");
+                }
+            }
+
+            if(flagValidationEnergy === 1) {
                  sweetAlert("Su solicitud no se puede tramitar", "Uno de las proyecciones escrita por usted tiene, supera el 50%", "error"); 
 				 return false; 
 			  }				  
-          
-          
+
             if (this.steps.length <= si) {
                 if (!this.options.cycleSteps) {
                     return false;

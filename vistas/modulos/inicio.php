@@ -79,6 +79,39 @@
        <div id="step-2">
               <div id="form-step-1" role="form" data-toggle="validator">
                   <div class="row">
+                      <div class="col-md-12">
+                          <h5 class="card-header info-color py-2" style="text-align:center; margin-bottom:15px; margin-top:15px">
+                              <strong>IMPORTANTE - INFORMACIÓN DEL MEDIDOR DE ENERGÍA</strong>
+                          </h5>
+                      </div>
+                  </div>
+                  <div class="row">
+                      <div class="modal-body">
+                          Si desea que Ruitoque ESP le proporcione el medidor de energía, puede marcar la
+                          opción SI,para eso es importante que diligencie la siguiente carta (la puede descargar <a href="CartaMedidorEnergia.pdf" target="_blank">aquí</a>)
+                          y adjuntarla al final con los otros documentos requeridos.
+                          <fieldset>
+                              <div>
+                                  <input type="radio" id="proporcionaMedidorSi" name="proporcionaMedidor" value="SI" checked />
+                                  <label for="proporcionaMedidorSi">SI</label>
+                              </div>
+
+                              <div>
+                                  <input type="radio" id="proporcionaMedidorNo" name="proporcionaMedidor" value="NO" />
+                                  <label for="proporcionaMedidorNo">NO</label>
+                              </div>
+                          </fieldset>
+
+                      </div>
+                  </div>
+                  <div class="row">
+                      <div class="col-md-12">
+                          <h5 class="card-header info-color py-2" style="text-align:center; margin-bottom:15px; margin-top:15px">
+                              <strong>DATOS DEL USUARIO</strong>
+                          </h5>
+                      </div>
+                  </div>
+                  <div class="row">
                           <div class="col-md-4">
                                   <label>Niu</label>
                                   <div class="input-group">
@@ -95,9 +128,9 @@
                                  </div>
                           </div>
                           <div class="col-md-4">
-                              <label>Nombre/Raz&oacute;n social</label>
+                              <label>Nombre/Raz&oacuten social</label>
                               <div class="form-group">
-                                  <input type="text" id="nombre_razon_social" name="nombre_razon_social" required  class="formalmacen_energia_cap-control" placeholder="Nombre o razon social" >
+                                  <input type="text" id="nombre_razon_social" name="nombre_razon_social" required  class="form-control" placeholder="Nombre o razon social" >
                                    <label for="nombre_razon_social" class="error" style="display:none;"></label>
                                    <div class="help-block with-errors"></div>
                               </div>
@@ -126,7 +159,7 @@
 
                                 <label> C&oacute;digo transformador</label>
                                  <div class="form-group">
-                                   <input type="text" class="form-control" name="codigo_transformador" id="codigo_transformador" required  placeholder="Código Transformador" >
+                                   <input type="text" class="form-control" name="codigo_transformador" id="codigo_transformador" required readonly="true"  placeholder="Código Transformador" >
                                  </div>
                                 <label for="regimen_comun" class="error" style="display:none;"></label>
                                 <div class="help-block with-errors"></div>
@@ -136,7 +169,7 @@
 
                                  <label> Serie</label>
                                  <div class="form-group">
-                                   <input type="text" class="form-control" name="serie" id="serie" required  placeholder="Serie" >
+                                   <input type="text" class="form-control" name="serie" id="serie" required readonly="true" placeholder="Serie" >
                                  </div>
                                 <label for="serie" class="error" style="display:none;"></label>
                                 <div class="help-block with-errors"></div>
@@ -208,8 +241,34 @@
                   <div class="row">
                       <div class="col-md-12">
                           <h5 class="card-header info-color py-2" style="text-align:center; margin-bottom:15px; margin-top:15px">
-                              <strong>TIPO DE TECNOLOGÍA UTILIZADA</strong>
+                              <strong>DATOS DEL PROMOTOR</strong>
                           </h5>
+                      </div>
+                  </div>
+                  <div class="row">
+                      <div class="col-md-4">
+                          <label>Nombre</label>
+                          <div class="form-group">
+                              <input type="text" id="nombrePromotor" name="nombrePromotor" required  class="form-control" placeholder="Nombre promotor" >
+                              <label for="regimen_comun" class="error" style="display:none;"></label>
+                              <div class="help-block with-errors"></div>
+                          </div>
+                      </div>
+                      <div class="col-md-4">
+                          <label>email</label>
+                          <div class="form-group">
+                              <input type="text" id="emailPromotor" name="emailPromotor" class="form-control" onblur="validateEmail(this.value)" required  placeholder="email promotor" >
+                          </div>
+                          <label for="regimen_comun" class="error" style="display:none;"></label>
+                          <div class="help-block with-errors"></div>
+                      </div>
+                      <div class="col-md-4">
+                          <label>Teléfono</label>
+                          <div class="form-group">
+                              <input type="number" class="form-control" name="telefonoPromotor" onblur="validatePhone(this.value)"  required  id="telefonoPromotor" placeholder="Teléfono Promotor" >
+                          </div>
+                          <label for="regimen_comun" class="error" style="display:none;"></label>
+                          <div class="help-block with-errors"></div>
                       </div>
                   </div>
               </div>
@@ -1299,9 +1358,7 @@ function hidePage()
 function showPage() 
 {
   document.getElementById("loader").style.display = "none";
-  //document.getElementById("step-1").style.display = "block";
     $( "#smartwizard" ).fadeTo( "fast" , 1, function() {
-    // Animation complete.
   });
 }
 
