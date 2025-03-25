@@ -1,8 +1,29 @@
+<style>
+    #overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        color: white;
+        font-size: 20px;
+        text-align: center;
+        padding-top: 20%;
+        z-index: 1051;
+    }
+    #archivoSubido { display: none; margin-top: 10px; }
+    .uploaded { color: green; font-weight: bold; }
+    .error { color: red; }
+</style>
+<div id="overlay">Procesado... Por favor espere.</div>
 <div id="loader" style="display:none;"></div>
-<form id="myForm" enctype="multipart/form-data"  role="form" data-toggle="validator" method="post" accept-charset="utf-8" action="inicio">
+<div id="myForm" enctype="multipart/form-data"  role="form" data-toggle="validator" method="post" accept-charset="utf-8" action="inicio">
 
 <input type="hidden" name="dispo_potencia" id="dispo_potencia" value="" />
 <input type="hidden" name="dispo_energia" id="dispo_energia" value="" />
+<input type="hidden" name="vlr_niu_solicitud_register_in" id="vlr_niu_solicitud_register_in" value="" />
 
 <div id="smartwizard" >
     <ul>
@@ -55,7 +76,7 @@
 	                            <button data-trans class="btn btn-outline-info btn-rounded btn-block z-depth-0 my-4 waves-effect" type="submit">Buscar por código de transformador</button>
 	                  </div>
 	                 <div class="col-md-5">
-	                            <input type="text" id="nro_solicitud_buscar" class="form-control" placeholder="Digite el número de la solicitud para ver su estado" autofocus  >
+	                            <input type="text" id="nro_solicitud_buscar" class="form-control" placeholder="Digite el número de la solicitud para ver su estado" autofocus  />
 	                            <button data-sol class="btn btn-outline-info btn-rounded btn-block z-depth-0 my-4 waves-effect" type="submit">Buscar solictud</button>
 	                
 	                  </div> 
@@ -1338,39 +1359,144 @@
     </div>
   </div>
 </div>
-<div id="ex5" class="modal" style="display: none;">
-  <p>If you do this, be sure to provide the user with an alternate method of <a href="#" rel="modal:close">closing the window.</a></p>
-</div>
+<!-- Formulario de registro de solicitud de entrada -->
+    <div class="modal fade con-imp-bd-example-modal-form-in-operation" tabindex="-1" role="dialog" id="form_register_modal" aria-labelledby="myLargeModalLabel_con-imp-form" aria-hidden="true" data-keyboard="false" data-backdrop="static">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title text-center w-100" id="myLargeModalLabel">Formulario de Solicitud</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="formRegisterInOperation">
+                        <input type="hidden" id="archivoId" name="archivoId" value="" />
+                        <input type="hidden" name="id_solicitud_in_session" id="id_solicitud_in_session" value="" />
 
-<script>
+                        <!-- Sección 1: Información del Cliente -->
+                        <fieldset>
+                            <legend class="text-center">Información del Cliente</legend>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="niuRegisterIn">Cuenta de cliente (NIU)</label>
+                                        <input type="text" class="form-control" id="niuRegisterIn" name="niuRegisterIn" readonly placeholder="Ingrese el NIU" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="municipioRegisterIn">Municipio</label>
+                                        <input type="text" class="form-control" id="municipioRegisterIn" readonly placeholder="Ingrese el municipio" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="direccionRegisterIn">Dirección</label>
+                                        <input type="text" class="form-control" id="direccionRegisterIn" readonly placeholder="Ingrese la dirección" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="departamento">Departamento</label>
+                                        <input type="text" class="form-control" id="departamentoRegisterIn" name="departamentoRegisterIn" readonly placeholder="Ingrese el departamento" required>
+                                    </div>
+                                </div>
+                            </div>
+                        </fieldset>
+                        <!-- Sección 2: Datos del Promotor -->
+                        <fieldset>
+                            <legend class="text-center">Datos del Promotor</legend>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="nombrePromotorIn">Nombre del Promotor</label>
+                                        <input type="text" class="form-control" id="nombrePromotorIn" name="nombrePromotorIn" placeholder="Ingrese el nombre del promotor" required>
+                                    </div>
+                                 <!--   <div class="form-group">
+                                        <label for="tipoDocumento">Tipo de documento</label>
+                                        <select class="form-control" id="tipoDocumento" name="tipoDocumento" required>
+                                            <option value="">Seleccione...</option>
+                                            <option value="cc">Cédula de Ciudadanía</option>
+                                            <option value="nit">NIT</option>
+                                            <option value="pasaporte">Pasaporte</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="numeroDocumento">Número de documento</label>
+                                        <input type="text" class="form-control" id="numeroDocumento" name="numeroDocumento" placeholder="Ingrese el número de documento" required>
+                                    </div>-->
+                                </div>
+                                <div class="col-md-6">
+                                   <!-- <div class="form-group">
+                                        <label for="celular">Celular</label>
+                                        <input type="tel" class="form-control" id="celularPromotor" name="celularPromotor" placeholder="Ingrese el celular" required>
+                                    </div>-->
+                                    <div class="form-group">
+                                        <label for="telefono">Teléfono</label>
+                                        <input type="tel" class="form-control" id="telefonoPromotorIn" name="telefonoPromotorIn" placeholder="Ingrese el teléfono" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="correo">Correo electrónico</label>
+                                        <input type="email" class="form-control" id="correoPromotorIn" name="correoPromotorIn" placeholder="Ingrese el correo electrónico" required>
+                                    </div>
+                                </div>
+                            </div>
+                        </fieldset>
+                        <!-- Sección 3: Documentos Requeridos -->
+                        <fieldset>
+                            <legend class="text-center">Documentos Requeridos</legend>
+                            <p>Por favor, suba un archivo comprimido (.zip, .rar, .7z) que contenga los siguientes documentos:</p>
+                            <ul>
+                                <li>Cédula del propietario</li>
+                                <li>Carta de autorización del propietario para realizar la solicitud de visita técnica para entrada en operación del proyecto AGPE</li>
+                                <li>Diagrama Unifilar firmado</li>
+                                <li>Dictamen de inspección RETIE</li>
+                                <li>Certificados de calibración y parametrización del sistema de medición (Importante enviar Claves del medidor)</li>
+                                <li>Certificados de conformidad de producto RETIE de todos los equipos utilizados en la conexión (paneles fotovoltaicos, inversor, conductores, ducterías, cajas, protecciones, etc.)</li>
+                                <li>Norma IEC 61215 y/o IEC 61730, para los paneles fotovoltaicos, norma UL 4703 o equivalente para los cables del sistema fotovoltaico. UL 6703 o equivalente y para el inversor el certificado de conformidad con la norma IEC 62109, UL 1741, IEC 61727. Anti-isla UL 1741 ó IEEE 1547, IEC 62116 (Esta información suele encontrarse en la ficha técnica o manual del equipo)</li>
+                            </ul>
+                            <div class="form-group">
+                                <div class="container mt-3">
+                                    <label for="archivoZip" class="fw-bold">Subir archivo comprimido (.zip, .rar, .7z):</label>
 
-function hidePage()
-{
-  document.getElementById("loader").style.display = "block";
-  //document.getElementById("step-1").style.display = "none";
- 
-  $( "#smartwizard" ).fadeTo( "fast" , 0.2, function() {
-    // Animation complete.
-  });
+                                    <div class="row align-items-center">
+                                        <div class="col-md-9">
+                                            <input type="file" id="archivoZip" accept=".zip,.rar,.7z" class="form-control" required>
+                                        </div>
+                                        <div class="col-md-3 text-end">
+                                            <button type="button" id="btnEliminar" class="btn btn-outline-danger d-flex align-items-center justify-content-center" style="display: none;">
+                                                <i class="bi bi-trash me-1"></i> Eliminar
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <p id="archivoSubido" class="mt-2 text-success fw-semibold"></p>
+                                    <div id="mensaje" style="display: none;"></div>
+                                </div>
+                            </div>
+                        </fieldset>
+                        <button type="submit" class="btn btn-primary btn-block">Enviar</button>
+                    </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
-}
 
-function showPage() 
-{
-  document.getElementById("loader").style.display = "none";
-    $( "#smartwizard" ).fadeTo( "fast" , 1, function() {
-  });
-}
+    <script>
 
-$(document).ready(function() {
+        function hidePage()
+        {
+          document.getElementById("loader").style.display = "block";
+          $( "#smartwizard" ).fadeTo( "fast" , 0.2, function() {
+            // Animation complete.
+          });
 
-//$('#importante_button').trigger('click');
+        }
 
-
-});
-
-//document.getElementById("importante_button").click();
-
+        function showPage()
+        {
+          document.getElementById("loader").style.display = "none";
+            $( "#smartwizard" ).fadeTo( "fast" , 1, function() {
+          });
+        }
 </script>
      
  <div class="container-fluid">
@@ -1378,8 +1504,6 @@ $(document).ready(function() {
         <div class="col-md-12">
           <div id="target_aviso" style="display:none;"><h1  >Ubicación geográfica</h1></div>
           <div id="map"  style="width:100%;height:400px;" >
-              
-              
           </div> <br><br>
               <script>
                       var map;
@@ -1405,15 +1529,122 @@ $(document).ready(function() {
                 
 
     </script>
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCAMxaH4x4TM1anbhqQHoa-H_2YhIP_CU8"
-    async defer></script>
+                <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCAMxaH4x4TM1anbhqQHoa-H_2YhIP_CU8"
+                async defer>
 
+                </script>
         </div>
       </div>
     </div>
-   
-   
-</form>
+    <script>
+        $(document).ready(function() {
+            let archivoID = null;
+            $("#archivoZip").change(function() {
+                let formData = new FormData();
+                let file = $("#archivoZip")[0].files[0];
+
+                if (!file) return;
+
+                formData.append("archivo", file);
+                formData.append("niu",document.getElementById("niuRegisterIn").value);
+                formData.append("solicitudNro",document.getElementById("id_solicitud_in_session").value);
+                // Mostrar overlay y deshabilitar elementos
+                $("#overlay").show();
+                $("button").prop("disabled", true);
+                $.ajax({
+                    url: "controladores/upload.php",
+                    type: "POST",
+                    data: formData,
+                    contentType: false,
+                    processData: false,
+                    success: function(response) {
+                        let data = JSON.parse(response);
+                        $("#overlay").hide();
+                        $("button").prop("disabled", false);
+                        if (data.success) {
+                            archivoID = data.id;
+                            $("#archivoId").val(archivoID);
+                            $("#archivoSubido").html("Archivo subido: " + file.name).addClass("uploaded").show();
+                            $("#btnEliminar").show();
+                            $("#archivoZip").prop("disabled", true);
+                        } else {
+                            alert("Error: " + data.message);
+                        }
+                    }
+                });
+            });
+
+            $("#btnEliminar").click(function() {
+                if (!archivoID) return;
+
+                $.post("controladores/delete.php", { id: archivoID, niu : document.getElementById("niuRegisterIn").value  }, function(response) {
+                    let data = JSON.parse(response);
+                    if (data.success) {
+                        archivoID = null;
+                        $("#archivoId").val("");
+                        $("#archivoSubido").hide().removeClass("uploaded");
+                        $("#btnEliminar").hide();
+                        $("#archivoZip").prop("disabled", false).val("");
+                    } else {
+                        alert("Error: " + data.message);
+                    }
+                });
+            });
+
+            document.getElementById("formRegisterInOperation").addEventListener("submit", function(event) {
+                event.preventDefault(); // Evita la recarga de la página
+
+                let archivoZip = document.getElementById("archivoZip").files.length;
+                if (archivoZip === 0) {
+                    mostrarMensaje("Por favor, suba primero el archivo ZIP antes de enviar el formulario.", "danger");
+                    return;
+                }
+                // Mostrar overlay y bloquear la pantalla
+                $("#overlay").show();
+                $("button").prop("disabled", true);
+
+                let formData = new FormData(this); // Captura los datos del formulario
+                formData.append("solicitudNro", document.getElementById("nro_solicitud_buscar").value);
+
+                fetch("controladores/guardar_datos.php", {
+                    method: "POST",
+                    body: formData
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            $("#overlay").hide();
+                            $("button").prop("disabled", false);
+                            mostrarMensaje("Formulario enviado con éxito. Redirigiendo al inicio ...", "success");
+                            setTimeout(() => {
+                                window.location.reload(); // Recargar la página
+                            }, 3000);
+                        } else {
+                            mostrarMensaje("Error al enviar el formulario: " + data.message, "danger");
+                        }
+                    })
+                    .catch(error => {
+                        console.error("Error en la solicitud:", error);
+                        mostrarMensaje("Hubo un problema al enviar el formulario. Inténtelo de nuevo.", "danger");
+                    })
+                    .finally(() => {
+                        overlay.style.display = "none"; // Ocultar overlay al finalizar
+                                   });
+            });
+
+            $("#mainForm").submit(function(e) {
+                if (!archivoID) {
+                    e.preventDefault();
+                    alert("Debe subir un archivo antes de enviar el formulario.");
+                }
+            });
+        });
+        function mostrarMensaje(mensaje, tipo) {
+            let mensajeDiv = document.getElementById("mensaje");
+            mensajeDiv.innerHTML = `<div class="alert alert-${tipo} text-center">${mensaje}</div>`;
+            mensajeDiv.style.display = "block";
+        }
+    </script>
 
 
 

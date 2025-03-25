@@ -1,8 +1,7 @@
 <?php
-  
-header('Content-type: text/html; charset=utf-8');
-header('Content-type: application/json; charset=utf-8');
 
+header('Content-Type: text/html; charset=UTF-8');
+header('Content-type: application/json; charset=utf-8');
 require_once('settings.config.php');          // Define db configuration arrays here
 require_once('DBConnection.php');  
 include __DIR__.'/../plugins/phpmailer/class.phpmailer.php';
@@ -15,8 +14,7 @@ include __DIR__.'/../plugins/phpmailer/PHPMailerAutoload.php';
 if( isset($_GET['codigo_transformador']) )
   {
      $jsondata = array();
-    /// $querywhere = "WHERE codigo_transformador = '" . $_GET['codigo_transformador']."'";
-	 
+
 	     if ( $result = $database->getQuery( "SELECT  a.codigo_transformador as trafo , a.capacidad_nominal, a.longitud, a.laltitud, a.altitud, a.voltaje_nominal, if (b.total is null,0,b.total) as total
 												FROM	
 													(   
@@ -193,11 +191,9 @@ else if( isset($_GET['codigo_usuario']) )
  {
    $jsondata = array();
 
-      if ( $result_estado = $database->getQuery( "Select  nro_solicitud, es.nombre as estado_solicitud, observaciones_empresa as observaciones from solicitudes sol left join estado_solicitud es on sol.estado_solicitud_idestado_solicitud=es.idestado_solicitud  where nro_solicitud='" . $_GET['codigo_solicitud']."'" ) ) 
+      if ( $result_estado = $database->getQuery( "SELECT  nro_solicitud, es.nombre as estado_solicitud, estado_solicitud_idestado_solicitud as idestadoSol, observaciones_empresa as observaciones,  idsolicitudes as idsol, Usuario_niu as niu FROM solicitudes sol LEFT JOIN estado_solicitud es ON sol.estado_solicitud_idestado_solicitud=es.idestado_solicitud  WHERE nro_solicitud='" . $_GET['codigo_solicitud']."'" ) )
          {
-    
-            
-          
+
             if( $result_estado->rowCount() > 0 ) 
               {
                     $jsondata["success"] = true;
@@ -206,7 +202,7 @@ else if( isset($_GET['codigo_usuario']) )
                     foreach($result_estado as $row)
                                 {
                                   
-                                   $utfEncodedArray = array_map("utf8_encode", $row );
+                                   $utfEncodedArray = array_map("utf8_encode", mb_convert_encoding($row, 'UTF-8', 'ISO-8859-1'));
                                   
                                    $jsondata["data"]["solicitud"][] = $utfEncodedArray;
                                    
@@ -268,6 +264,41 @@ else if( isset($_GET['codigo_usuario']) )
 
        }
     echo json_encode($jsondata, JSON_UNESCAPED_UNICODE);
+ }
+ else if( isset($_GET['code_user']) )
+ {
+     $jsondata = array();
+
+     if ( $result_estado = $database->getQuery( "SELECT nombrePromotor, emailPromotor, telefonoPromotor, ID_INTERNO as niu,DIRECCION_FRONTERA as direccion, MUNICIPIO as municipio, DEPT as dpto 
+                                                                FROM solicitudes as a LEFT JOIN datosCliente as b ON a.Usuario_niu = b.ID_INTERNO 
+                                                                WHERE a.nro_solicitud = '".$_GET['code_user']."'"))
+     {
+
+
+         if( $result_estado->rowCount() > 0 )
+         {
+             $jsondata["success"] = true;
+             $jsondata["data"]["usuario"] = array();
+             foreach($result_estado as $row)
+             {
+
+                 $jsondata["data"]["usuario"][] = $row;
+             }
+         }
+         else
+         {
+             $jsondata["success"] = false;
+             $jsondata["data"] = array('message' => 'No se encontró ningún resultado.');
+
+         }
+     }
+     else
+     {
+         $jsondata["success"] = false;
+         $jsondata["data"] = array('message' => $database->error);
+
+     }
+     echo json_encode($jsondata, JSON_UNESCAPED_UNICODE);
  }
 else 
  {

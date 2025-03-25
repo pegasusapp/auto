@@ -9,17 +9,7 @@ class ModeloUsuario{
 	CONSULTAR USUARIO
 	=============================================*/
 
-  
-    /*public function ajaxConsultaProveedor()
-    {
-      $item = "cc_nit";
-      $tabla = "proveedores";
-      $valor = $this->nit;
-      $respuesta = ControladorProveedores::consultaNit($item,$tabla,$valor);
-      echo $respuesta; 
-      
-    }*/
-   
+
 	public function mdlConsultaUsuario($valor)
   {
 		   

@@ -1,30 +1,30 @@
 
 
               // getdeails será nuestra función para enviar la solicitud ajax
-              var getdetails = function(codigo_transformador)
+              let getdetails = function(codigo_transformador)
                   {
                       return $.getJSON("modelos/consulta.php", 
                             {
                               "codigo_transformador": codigo_transformador
                              });
 
-                  }
-              var getdetails_user = function(codigo_usuario) 
+                  };
+              let getdetails_user = function(codigo_usuario)
                   {
                       return $.getJSON("modelos/consulta.php", 
                             {
                               "codigo_usuario": codigo_usuario
                               });
 
-                  }
+                  };
 
-              var getdetails_user_data = function( vlr_usuario_detalle)
+              let getdetails_user_data = function( vlr_usuario_detalle)
                   {
                       return $.getJSON("modelos/consulta.php", 
                             {
                               "codigo_usuario_detalle": vlr_usuario_detalle
                             });
-                  }
+                  };
 //**--------------------------------------------------------------------------------------------//-------------------------------------**//
 
       $('[data-trans]').click(function(e)
@@ -61,7 +61,7 @@
                                    $.each(value, function(userkey, uservalue)
                                      {  
 											
-                                          if(userkey=="total")
+                                          if(userkey==="total")
                                           {
                                                   if (parseFloat(uservalue) >= 0 && parseFloat(uservalue)<=9 )
                                                       {
@@ -91,7 +91,7 @@
                                                           output +=  "<td class='bg-danger'>"+uservalue+ '</td>';
                                                       }    
                                           }
-                                          else if(userkey=="dispo_energia")
+                                          else if(userkey==="dispo_energia")
                                               {
                                                     if (parseFloat(uservalue) >= 0 && parseFloat(uservalue)<=30 )
                                                         {
@@ -184,12 +184,12 @@
                                       $.each(value, function(userkey, uservalue) // each 2
                                         {
                                            
-                                                if(userkey=="codigo_transformador")
+                                                if(userkey==="codigo_transformador")
                                                  {
                                                   $("#codTransformador").val(uservalue);
                                                  }
 
-                                                if(userkey=="dispo_potencia")
+                                                if(userkey==="dispo_potencia")
                                                  {
                                                        if (parseFloat(uservalue) >= 0 && parseFloat(uservalue)<=9 )
                                                         {
@@ -212,7 +212,7 @@
                                                           output +=  "<td class='bg-danger'>"+uservalue+ '</td>';
                                                         }    
                                                   }
-                                                else if(userkey=="dispo_energia")
+                                                else if(userkey==="dispo_energia")
                                                   {
                                                       if (parseFloat(uservalue) >= 0 && parseFloat(uservalue)<=30 )
                                                           {
@@ -275,11 +275,9 @@
                             {
                               if (response.success)
                                 {
-                                  var output="";
                                   $.each(response.data.transformador, function(key, value)
                                    {
-                                       // alert(key+"--"+value);
-                                    
+
                                         $.each(value, function(userkey, uservalue)
                                           {
 

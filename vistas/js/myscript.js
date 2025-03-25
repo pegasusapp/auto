@@ -2,31 +2,39 @@ let flagValidationEnergy = 0;
 $(document).ready(function()
 {
 
-    var getdetails = function(codigo_transformador) {
+
+
+    let getdetails = function(codigo_transformador) {
         return $.getJSON("modelos/consulta.php", {
             "codigo_transformador": codigo_transformador
         });
     };
-    var getdetails_user = function(codigo_usuario) {
+    let getdetails_user = function(codigo_usuario) {
         return $.getJSON("modelos/consulta.php", {
             "codigo_usuario": codigo_usuario
         });
     };
-   var getdetails_user_estado = function(codigo_usuario) {
+    let getdetails_user_estado = function(codigo_usuario) {
         return $.getJSON("modelos/consulta.php", {
             "codigo_usuario_estado": codigo_usuario
         });
    };
-   var getdetails_sol_estado = function(codigo_solicitud) {
+    let getdetails_sol_estado = function(codigo_solicitud) {
         return $.getJSON("modelos/consulta.php", {
             "codigo_solicitud": codigo_solicitud
         });
    };
-   var getdetails_user_data_in = function(vlrTrafo){
+    let getdetails_user_data_in = function(vlrTrafo){
 		return $.getJSON("modelos/consulta.php",{
 			"vlr_trafo" : vlrTrafo
 		});
    };
+
+    let getdetails_user_data_in_form_register = function(codeUser){
+        return $.getJSON("modelos/consulta.php",{
+            "code_user" : codeUser
+        });
+    };
 
     $('[data-trans]').click(function(e)
           {
@@ -143,32 +151,60 @@ $(document).ready(function()
                                               output += '<table class="table">';
                                               output += '    <thead class="thead-dark">';
                                               output += '      <tr>';
-                                              output += '        <th scope="col">CODIGO DE SOLICITUD</th>';
+                                              output += '        <th scope="col">COD. SOLICITUD</th>';
                                               output += '        <th scope="col">ESTADO</th>';
                                               output += '        <th scope="col">OBSERVACIONES</th>';
+                                              output += '        <th scope="col">REGISTRO ENTRADA OPERACIÓN</th>';
                                               output += '      </tr>';
                                               output += '    </thead>';
                                               output += '<tbody><tr class="table-light">';
-                                        $.each(value, function(userkey, uservalue)
+                                       let statusApplication = "";
+                                       let nroSolicitud = "";
+                                       let idStatusSolicitud = 0;
+                                       $.each(value, function(userkey, uservalue)
                                           {
-                                             
+
                                              if(userkey==="nro_solicitud") {
-                                                 output +=  "<td class='bg-success'>"+uservalue+ '</td>';
+                                                 nroSolicitud = uservalue;
+                                                 output +=  "<td class='bg-success'>"+nroSolicitud+"</td>";
                                              }
-                                             if(userkey==="estado_solicitud") {
-                                                    if(uservalue==="Registrada") {
-                                                          output +=  "<td class='bg-warning'>"+uservalue+ '</td>';
-                                                    } else if(uservalue==="Aprobada") {
-                                                          output +=  "<td class='bg-success'>"+uservalue+ '</td>';
-                                                    } else if(uservalue==="Funcional") {
-                                                          output +=  "<td class='bg-success'>"+uservalue+ '</td>';
-                                                    } else {
-                                                          output +=  "<td class='bg-low_danger'>"+uservalue+ '</td>';
-                                                    }
+                                             if(userkey === "idsol") {
+                                                 document.getElementById("id_solicitud_in_session").value = uservalue;
                                              }
-                                             if(userkey==="observaciones") {
-                                                 output +=  "<td class='bg-success'>"+uservalue+ '</td>';
+                                              if(userkey==="estado_solicitud") {
+                                                  statusApplication = uservalue;
+                                              }
+                                             if(userkey === "idestadoSol") {
+                                                 idStatusSolicitud = uservalue;
+                                                 if(uservalue===1) {
+                                                     output +=  "<td class='bg-info'>"+statusApplication+ "</td>";
+                                                 } else if(uservalue===2) {
+                                                     output +=  "<td class='bg-success'>"+statusApplication+ "</td>";
+                                                 } else if(uservalue===3) {
+                                                     output +=  "<td class='bg-success'>"+statusApplication+ "</td>";
+                                                 } else if(uservalue===6) {
+                                                     output +=  "<td class='bg-success'>"+statusApplication+ "</td>";
+                                                 } else {
+                                                     output +=  "<td class='bg-warning'>"+statusApplication+ "</td>";
+                                                 }
                                              }
+
+                                             if (userkey==="observaciones") {
+                                                 output +=  "<td class='bg-success'>"+uservalue+ "</td>";
+                                             }
+                                              if (userkey==="niu") {
+                                                  if (idStatusSolicitud === "2" || idStatusSolicitud === "8" ) {
+                                                      document.getElementById('vlr_niu_solicitud_register_in').value = uservalue;
+                                                      output +=  "<td class='bg-info'><button data-form-register  data-toggle=\"modal\" id=\"form_register_button\" data-target=\"#form_register_modal\" class=\"btn btn-warning\"  type=\"submit\">Registro</button></td>";
+                                                  } else if(idStatusSolicitud === "6") {
+                                                      output +=  "<td class='bg-info'>Solicitud para entrada en operación realizada, en proceso de evaluación.</td>";
+                                                  } else {
+                                                      output +=  "<td class='bg-info'>No se encuentra disponible, su solicitud no está en estado funcional</td>";
+                                                  }
+                                              }
+
+
+
                                           });
                                         output += '</tr></<tbody>';
                                        output+='  </table>';
@@ -189,6 +225,95 @@ $(document).ready(function()
                                   $("#validador").val("");
                               });
                       });
+
+//**--------------------------------------------------------------------------------------------//-------------------------------------**//
+
+    $(document).on('click', '#form_register_button', function() {
+        let vlr_niu_solicitud=document.getElementById('vlr_niu_solicitud_register_in').value;
+        let codeSolictud = document.getElementById("nro_solicitud_buscar").value;
+        hidePage();
+        getdetails_user_data_in_form_register(codeSolictud)
+            .done(function(response)
+            {
+                console.log(response);  // Revisa la respuesta que llega desde el servidor
+                if (response.success)
+                {
+                    showPage();
+                    let output="";
+                    $.each(response.data.usuario, function(key, value) {
+                        // Recorre las propiedades dentro de cada objeto de usuario
+                        if (typeof value === 'object') {
+                            // Si "value" es un objeto, iteramos sobre sus claves y valores
+                            Object.keys(value).forEach(function(keys) {
+                                const values = value[keys];
+
+                                if (keys === "nombrePromotor") {
+                                    const nombrePromotorInput = document.getElementById("nombrePromotorIn");
+                                    if (nombrePromotorInput) {
+                                        nombrePromotorInput.value = values;
+                                    }
+                                } else if (keys === "emailPromotor") {
+                                    const emailPromotorInput = document.getElementById("correoPromotorIn");
+                                    if (emailPromotorInput) {
+                                        emailPromotorInput.value = values;
+                                    }
+
+                                } else if (keys === "telefonoPromotor") {
+                                    const telefonoPromotorInput = document.getElementById("telefonoPromotorIn");
+                                    if (telefonoPromotorInput) {
+                                        telefonoPromotorInput.value = values;
+                                    }
+                                } else if (keys === "niu") {
+                                    const niuInput = document.getElementById("niuRegisterIn");
+                                    if (niuInput) {
+                                        niuInput.value = values;
+                                    }
+                                } else if(keys === "direccion") {
+                                    const direccionInput = document.getElementById("direccionRegisterIn");
+                                    if (direccionInput) {
+                                        direccionInput.value = values;
+                                    }
+
+                                } else if(keys === "municipio") {
+                                    const municipioInput = document.getElementById("municipioRegisterIn");
+                                    if (municipioInput) {
+                                        municipioInput.value = values;
+                                    }
+                                } else if(keys === "dpto") {
+                                    const departamentoInput = document.getElementById("departamentoRegisterIn");
+                                    if (departamentoInput) {
+                                        departamentoInput.value = values;
+                                    }
+                                }
+                            });
+                        }
+                    });
+                } else {
+                    showPage();
+                    $("#response-container").html(response.data.message);
+                    sweetAlert("Oops", response.data.message, "error");
+                    $("#validador").val("");
+                    $("#nro_solicitud_buscar").val("");
+                }
+            })
+            .fail(function(jqXHR, textStatus, errorThrown)
+            {
+                // Muestra el estado completo de la solicitud y el error
+                console.error("Error en la solicitud Ajax:");
+                console.error("Estado de la solicitud (jqXHR):", jqXHR);
+                console.error("Estado de la conexión (textStatus):", textStatus);
+                console.error("Error lanzado (errorThrown):", errorThrown);
+
+                // Si el objeto jqXHR contiene datos adicionales, como la respuesta del servidor,
+                // puedes agregarlo también al log
+                if (jqXHR.responseText) {
+                    console.error("Respuesta del servidor (jqXHR.responseText):", jqXHR.responseText);
+                }
+                showPage();
+                $("#response-container").html("Algo ha fallado, comuniquese con nuestra linea, 6185871 ext 341: " + textStatus );
+                $("#validador").val("");
+            });
+    });
 //**--------------------------------------------------------------------------------------------//-------------------------------------**//
                           let btnFinish = $('<button></button>').text('Enviar')
                                                            .addClass('btn btn-info')
@@ -286,9 +411,9 @@ $(document).ready(function()
                           $('input[type=file]').bind("change",function()
                                                   {
                                                      var iden=this.id;
-                                                    if(this.files[0].size > 21000000)
+                                                    if(this.files[0].size > 61000000)
                                                       {
-                                                        sweetAlert("Oops...", "El tamaño de tu archivo es muy grande, Cambialo. Max 20 Mb!", "error");
+                                                        sweetAlert("Oops...", "El tamaño de tu archivo es muy grande, Cambialo. Max 50 Mb!", "error");
                                                         var controlInput = $("#"+iden+"");
                                                         controlInput.replaceWith(controlInput = controlInput.val('').clone(true));
                                                         }
@@ -359,7 +484,24 @@ $(document).ready(function()
                       });
 
 //**--------------------------------------------------------------------------------------------//-------------------------------------**//
+    function toggleCamposPromotor() {
+        if ($('#tipoSolicitante').val() === 'promotor') {
+            $('#camposPromotor, #camposPromotor2').show(); // Muestra los campos
+        } else {
+            // Oculta los campos
+            $('#camposPromotor, #camposPromotor2').hide();
 
+            // Limpia los valores de los campos relacionados con Promotor
+            $('#tipoDocumento').val(''); // Limpia el tipo de documento
+            $('#numeroDocumento').val(''); // Limpia el número de documento
+            $('#celular').val(''); // Limpia el celular
+            $('#telefono').val(''); // Limpia el teléfono
+            $('#correo').val(''); // Limpia el correo
+        }
+    }
+
+    // Ejecuta la función al cambiar el tipo de solicitante
+    $('#tipoSolicitante').change(toggleCamposPromotor);
 
 
 });
@@ -396,7 +538,7 @@ function getStructToTrafo(response){
             if (userKey === "total") {
                 dispo_potencia_global = userValue;
                 calculado = ((userValue * 100) / vlr_capacidad_nom).toFixed(2);
-
+                calculado = 42;
                 if (parseFloat(calculado) >= 0 && parseFloat(calculado) <= 30) {
                     output += "<td class='bg-success'>" + calculado + '</td>';
                 } else if (parseFloat(calculado) > 30 && parseFloat(calculado) <= 40) {
@@ -421,15 +563,6 @@ function getStructToTrafo(response){
         output+='  </table>';
     });
    return output;
-}
-function searchValueDB()
-{
-	let listValueArray = [];
-	for(i=1; i <= 12; i++)
-		{
-			listValueArray.push(document.getElementById("proy_ener_gen_or_m"+i).value);
-		}
-	console.log(Math.max.apply(Math,listValueArray));
 }
 
 function changeOption2(valor)
